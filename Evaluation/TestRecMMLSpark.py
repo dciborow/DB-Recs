@@ -75,7 +75,7 @@ paramGrid = ParamGridBuilder() \
 evaluator = RecommendationEvaluator().setSaveAll(True)
 
 tvRecommendationSplit = TrainValidRecommendSplit() \
-    .setEstimator(sar) \
+    .setEstimator(als) \
     .setEvaluator(evaluator) \
     .setEstimatorParamMaps(paramGrid) \
     .setTrainRatio(0.8) \
