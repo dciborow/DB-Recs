@@ -25,6 +25,6 @@ celebs = RecognizeDomainSpecificContent()\
 #Extract the first celebrity we see from the structured response
 firstCeleb = SQLTransformer(statement="SELECT *, celebs.result.celebrities[0].name as firstCeleb FROM __THIS__")
 
-celeb = PipelineModel(stages=[celebs, firstCeleb]).transform(urls)
-celeb.write.parquet("wasbs://azureml@"+def_blob_store.account_name+".blob.core.windows.net/raw_data/cog_services/celebs/celeb/", mode='overwrite')
-celeb
+output = PipelineModel(stages=[celebs, firstCeleb]).transform(urls)
+output.write.parquet("wasbs://azureml@"+def_blob_store.account_name+".blob.core.windows.net/raw_data/cog_services/celebs/celeb/", mode='overwrite')
+output
