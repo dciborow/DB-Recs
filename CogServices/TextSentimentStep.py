@@ -3,12 +3,19 @@ from pyspark.ml.feature import SQLTransformer
 from pyspark.ml import PipelineModel
 from pyspark.sql import SparkSession
 
-account_name = def_blob_store.account_name
-wasb_path    = "wasbs://azureml@"+account_name+".blob.core.windows.net/"
-input_path   = wasb_path + "raw_data/cog_services/celebs/text/"
-output_path  = wasb_path + "raw_data/cog_services/celebs/sentiment/"
 
-text = SparkSession.builder.getOrCreate().read.parquet(input_path)
+dbutils.widgets.get("account_name") 
+account_name = getArgument("account_name")
+
+dbutils.widgets.get("input_path") 
+input_path = getArgument("input_path")
+
+dbutils.widgets.get("output_path") 
+output_path = getArgument("output_path")
+
+wasb_path    = "wasbs://azureml@"+account_name+".blob.core.windows.net/"
+
+text = SparkSession.builder.getOrCreate().read.parquet(wasb_path + input_path)
 
 dbutils.widgets.get("TEXT_API_KEY") 
 TEXT_API_KEY = getArgument("TEXT_API_KEY")
@@ -32,5 +39,5 @@ sentimentTransformer = TextSentiment()\
 getSentiment = SQLTransformer(statement="SELECT *, "+output_col_sentiment+"[0].score as sentimentScore FROM __THIS__")
 
 output = PipelineModel(stages=[sentimentTransformer, getSentiment]).transform(text)
-output.write.parquet(output_path, mode='overwrite')
+output.write.parquet(wasb_path + output_path, mode='overwrite')
 output
