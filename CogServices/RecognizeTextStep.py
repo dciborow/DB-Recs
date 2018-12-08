@@ -12,6 +12,9 @@ image_urls = SparkSession.builder.getOrCreate().read.parquet(input_path)
 dbutils.widgets.get("VISION_API_KEY") 
 VISION_API_KEY = getArgument("VISION_API_KEY")
 
+dbutils.widgets.get("region") 
+region = getArgument("region")
+
 dbutils.widgets.get("mode") 
 mode = getArgument("mode")
 
