@@ -3,6 +3,14 @@ from pyspark.ml import PipelineModel
 from pyspark.sql import SparkSession
 
 #Get the inputs for the Databricks ML Step
+dbutils.widgets.get("account_name") 
+account_name = getArgument("account_name")
+
+dbutils.widgets.get("output_path") 
+output_path = getArgument("output_path")
+
+wasb_path    = "wasbs://azureml@"+account_name+".blob.core.windows.net/"
+
 dbutils.widgets.get("BING_IMAGE_SEARCH_KEY") 
 BING_IMAGE_SEARCH_KEY = getArgument("BING_IMAGE_SEARCH_KEY")
 
@@ -25,5 +33,5 @@ bingSearch = BingImageSearch()\
 getUrls = BingImageSearch.getUrlTransformer("images", "url")
 
 output = PipelineModel(stages=[bingSearch, getUrls]).transform(bingParameters).cache()
-output.write.parquet("wasbs://azureml@"+def_blob_store.account_name+".blob.core.windows.net/raw_data/cog_services/celebs/urls/", mode='overwrite')
+output.write.parquet(wasb_path + output_path, mode='overwrite')
 output
