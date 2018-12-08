@@ -24,6 +24,6 @@ bingSearch = BingImageSearch()\
 #Transformer to that extracts and flattens the richly structured output of Bing Image Search into a simple URL column
 getUrls = BingImageSearch.getUrlTransformer("images", "url")
 
-urls = PipelineModel(stages=[bingSearch, getUrls]).transform(bingParameters).cache()
-urls.write.parquet("wasbs://azureml@"+def_blob_store.account_name+".blob.core.windows.net/raw_data/cog_services/celebs/urls/", mode='overwrite')
-urls
+output = PipelineModel(stages=[bingSearch, getUrls]).transform(bingParameters).cache()
+output.write.parquet("wasbs://azureml@"+def_blob_store.account_name+".blob.core.windows.net/raw_data/cog_services/celebs/urls/", mode='overwrite')
+output
