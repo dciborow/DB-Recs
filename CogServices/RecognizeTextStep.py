@@ -45,6 +45,6 @@ def getTextFunction(ocrRow):
 
 getText = UDFTransformer().setUDF(udf(getTextFunction)).setInputCol(mid_col).setOutputCol(output_col_rec_text)
 
-text = PipelineModel(stages=[recognizeText, getText]).transform(image_urls)
-text.write.parquet(output_path, mode='overwrite')
-text
+output = PipelineModel(stages=[recognizeText, getText]).transform(image_urls)
+output.write.parquet(output_path, mode='overwrite')
+output
