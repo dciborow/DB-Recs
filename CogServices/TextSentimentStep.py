@@ -31,6 +31,6 @@ sentimentTransformer = TextSentiment()\
 #Extract the sentiment score from the API response body
 getSentiment = SQLTransformer(statement="SELECT *, "+output_col_sentiment+"[0].score as sentimentScore FROM __THIS__")
 
-sentiment = PipelineModel(stages=[sentimentTransformer, getSentiment]).transform(text)
-sentiment.write.parquet(output_path, mode='overwrite')
-sentiment
+output = PipelineModel(stages=[sentimentTransformer, getSentiment]).transform(text)
+output.write.parquet(output_path, mode='overwrite')
+output
