@@ -4,7 +4,18 @@ from mmlspark import RecognizeDomainSpecificContent
 from pyspark.ml.feature import SQLTransformer
 from pyspark.sql import SparkSession
 
-urls = SparkSession.builder.getOrCreate().read.parquet("wasbs://azureml@"+def_blob_store.account_name+".blob.core.windows.net/raw_data/cog_services/celebs/urls/")
+dbutils.widgets.get("account_name") 
+account_name = getArgument("account_name")
+
+dbutils.widgets.get("input_path") 
+input_path = getArgument("input_path")
+
+dbutils.widgets.get("output_path") 
+output_path = getArgument("output_path")
+
+wasb_path    = "wasbs://azureml@"+account_name+".blob.core.windows.net/"
+
+urls = SparkSession.builder.getOrCreate().read.parquet(wasb_url + input_path)
 
 dbutils.widgets.get("VISION_API_KEY") 
 VISION_API_KEY = getArgument("VISION_API_KEY")
@@ -26,5 +37,5 @@ celebs = RecognizeDomainSpecificContent()\
 firstCeleb = SQLTransformer(statement="SELECT *, celebs.result.celebrities[0].name as firstCeleb FROM __THIS__")
 
 output = PipelineModel(stages=[celebs, firstCeleb]).transform(urls)
-output.write.parquet("wasbs://azureml@"+def_blob_store.account_name+".blob.core.windows.net/raw_data/cog_services/celebs/celeb/", mode='overwrite')
+output.write.parquet(wasb_url+output_path, mode='overwrite')
 output
