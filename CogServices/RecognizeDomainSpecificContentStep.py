@@ -15,7 +15,7 @@ output_path = getArgument("output_path")
 
 wasb_path    = "wasbs://azureml@"+account_name+".blob.core.windows.net/"
 
-urls = SparkSession.builder.getOrCreate().read.parquet(wasb_url + input_path)
+urls = SparkSession.builder.getOrCreate().read.parquet(wasb_path + input_path)
 
 dbutils.widgets.get("VISION_API_KEY") 
 VISION_API_KEY = getArgument("VISION_API_KEY")
@@ -37,5 +37,5 @@ celebs = RecognizeDomainSpecificContent()\
 firstCeleb = SQLTransformer(statement="SELECT *, celebs.result.celebrities[0].name as firstCeleb FROM __THIS__")
 
 output = PipelineModel(stages=[celebs, firstCeleb]).transform(urls)
-output.write.parquet(wasb_url+output_path, mode='overwrite')
+output.write.parquet(wasb_path+output_path, mode='overwrite')
 output
