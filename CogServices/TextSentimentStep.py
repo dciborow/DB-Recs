@@ -13,6 +13,9 @@ text = SparkSession.builder.getOrCreate().read.parquet(input_path)
 dbutils.widgets.get("TEXT_API_KEY") 
 TEXT_API_KEY = getArgument("TEXT_API_KEY")
 
+dbutils.widgets.get("region") 
+region = getArgument("region")
+
 dbutils.widgets.get("text_col") 
 text_col = getArgument("text_col")
 
