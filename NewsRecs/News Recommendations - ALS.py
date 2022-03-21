@@ -99,7 +99,7 @@ predictions = model.transform(ratings)
 evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",
                                 predictionCol="prediction")
 rmse = evaluator.evaluate(predictions)
-print("Root-mean-square error = " + str(rmse))
+print(f"Root-mean-square error = {str(rmse)}")
 
 # COMMAND ----------
 
@@ -112,9 +112,10 @@ output = RankingAdapter(mode='allUsers', k=5, recommender=algo) \
   .transform(ratings)
 
 metrics = ['ndcgAt','map','recallAtK','mrr','fcp']
-metrics_dict = {}
-for metric in metrics:
-    metrics_dict[metric] = RankingEvaluator(k=3, metricName=metric).evaluate(output)
+metrics_dict = {
+    metric: RankingEvaluator(k=3, metricName=metric).evaluate(output)
+    for metric in metrics
+}
 
 metrics_dict    
 
@@ -123,10 +124,8 @@ metrics_dict
 # Recommend Subset Wrapper
 def recommendSubset(self, df, timestamp):
   def Func(lines):
-    out = []
-    for i in range(len(lines[1])):
-      out += [(lines[1][i],lines[2][i])]
-    return lines[0], out
+      out = [(lines[1][i],lines[2][i]) for i in range(len(lines[1]))]
+      return lines[0], out
 
   tup = StructType([
     StructField('itemId', IntegerType(), True),
@@ -223,7 +222,7 @@ predictions = model.transform(ratings)
 evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",
                                 predictionCol="prediction")
 rmse = evaluator.evaluate(predictions)
-print("Root-mean-square error = " + str(rmse))
+print(f"Root-mean-square error = {str(rmse)}")
 
 # Evaluate the model by computing ranking metrics on the rating data
 from mmlspark.RankingAdapter import RankingAdapter
@@ -234,9 +233,10 @@ output = RankingAdapter(mode='allUsers', k=5, recommender=algo) \
   .transform(ratings)
 
 metrics = ['ndcgAt','map','recallAtK','mrr','fcp']
-metrics_dict = {}
-for metric in metrics:
-    metrics_dict[metric] = RankingEvaluator(k=3, metricName=metric).evaluate(output)
+metrics_dict = {
+    metric: RankingEvaluator(k=3, metricName=metric).evaluate(output)
+    for metric in metrics
+}
 
 print(metrics_dict)
 

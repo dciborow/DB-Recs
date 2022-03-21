@@ -109,17 +109,13 @@ def find_collection(client, dbid, id):
             }
         ))
 
-        if len(collections) > 0:
-            return True
-        else:
-            return False
+        return len(collections) > 0
 def read_collection(client, dbid, id):
         try:
-            database_link = 'dbs/' + dbid
-            collection_link = database_link + '/colls/{0}'.format(id)
+                database_link = 'dbs/' + dbid
+                collection_link = database_link + '/colls/{0}'.format(id)
 
-            collection = client.ReadCollection(collection_link)
-            return collection
+                return client.ReadCollection(collection_link)
         except errors.DocumentDBError as e:
             if e.status_code == 404:
                print('A collection with id \'{0}\' does not exist'.format(id))
@@ -127,16 +123,15 @@ def read_collection(client, dbid, id):
                 raise errors.HTTPFailure(e.status_code)    
 
 def read_database(client, id):
-    try:
-        database_link = 'dbs/' + id
+        try:
+                database_link = 'dbs/' + id
 
-        database = client.ReadDatabase(database_link)
-        return database
-    except errors.DocumentDBError as e:
-        if e.status_code == 404:
-           print('A database with id \'{0}\' does not exist'.format(id))
-        else: 
-            raise errors.HTTPFailure(e.status_code)  
+                return client.ReadDatabase(database_link)
+        except errors.DocumentDBError as e:
+            if e.status_code == 404:
+               print('A database with id \'{0}\' does not exist'.format(id))
+            else: 
+                raise errors.HTTPFailure(e.status_code)  
             
 def find_database(client, id):
         databases = list(client.QueryDatabases({
@@ -146,10 +141,7 @@ def find_database(client, id):
             ]
         }))
 
-        if len(databases) > 0:
-            return True
-        else:
-            return False            
+        return len(databases) > 0            
 
 client = get_client_from_cli_profile(azure.mgmt.cosmosdb.CosmosDB)
 
@@ -203,20 +195,20 @@ with open("secrets.json", "w") as file:
 # COMMAND ----------
 
 # Download Movie Lens
-basedataurl = "http://aka.ms" 
+basedataurl = "http://aka.ms"
 datafile = "MovieRatings.csv"
 
 datafile_dbfs = os.path.join("/dbfs", datafile)
 
 if os.path.isfile(datafile_dbfs):
-    print("found {} at {}".format(datafile, datafile_dbfs))
+        print(f"found {datafile} at {datafile_dbfs}")
 else:
-    print("downloading {} to {}".format(datafile, datafile_dbfs))
-    urllib.request.urlretrieve(os.path.join(basedataurl, datafile), datafile_dbfs)
-    
+        print(f"downloading {datafile} to {datafile_dbfs}")
+        urllib.request.urlretrieve(os.path.join(basedataurl, datafile), datafile_dbfs)
+
 data_all = sqlContext.read.format('csv')\
                      .options(header='true', delimiter=',', inferSchema='true', ignoreLeadingWhiteSpace='true', ignoreTrailingWhiteSpace='true')\
-                     .load(datafile)    
+                     .load(datafile)
 data_all.printSchema()
 display(data_all)
 
@@ -224,15 +216,17 @@ display(data_all)
 
 train, test = data_all.cache().randomSplit([0.75, 0.25], seed=123)
 
-print("train ({}, {})".format(train.cache().count(), len(train.columns)))
-print("test ({}, {})".format(test.cache().count(), len(test.columns)))
+print(f"train ({train.cache().count()}, {len(train.columns)})")
+print(f"test ({test.cache().count()}, {len(test.columns)})")
 
 train_data_path_dbfs = os.path.join("/dbfs", train_data_path)
 test_data_path_dbfs = os.path.join("/dbfs", test_data_path)
 
 train.write.mode('overwrite').parquet(train_data_path)
 test.write.mode('overwrite').parquet(test_data_path)
-print("train and test datasets saved to {} and {}".format(train_data_path_dbfs, test_data_path_dbfs))
+print(
+    f"train and test datasets saved to {train_data_path_dbfs} and {test_data_path_dbfs}"
+)
 
 # COMMAND ----------
 
@@ -268,17 +262,17 @@ i = 0
 
 # record a bunch of reg values in a ALS model
 for reg in regs:
-    print(reg)
-    # create a bunch of child runs
-    with root_run.child_run("reg-" + str(reg)) as run:
-        rmse = cvModel.avgMetrics[i]
-        print("Root-mean-square error = " + str(rmse))
-        
-        # log reg, rmse and feature names in run history
-        run.log("reg", reg)
-        run.log("rmse", rmse)
-        run.log_list("columns", train.columns)
-        i += 1
+        print(reg)
+            # create a bunch of child runs
+        with root_run.child_run(f"reg-{str(reg)}") as run:
+                rmse = cvModel.avgMetrics[i]
+                print(f"Root-mean-square error = {str(rmse)}")
+
+                # log reg, rmse and feature names in run history
+                run.log("reg", reg)
+                run.log("rmse", rmse)
+                run.log_list("columns", train.columns)
+                i += 1
 
 # COMMAND ----------
 
@@ -295,7 +289,7 @@ root_run.upload_file("outputs/" + model_name, model_zip)
 # now delete the serialized model from local folder since it is already uploaded to run history 
 # shutil.rmtree(model_dbfs)
 os.remove(model_zip)
-        
+
 # Declare run completed
 root_run.complete()
 
@@ -312,7 +306,7 @@ display(pred)
 re = RegressionEvaluator(metricName="rmse", labelCol=ratingCol,
                                 predictionCol="prediction")
 rmse = re.evaluate(pred)
-print("Root-mean-square error = " + str(rmse))
+print(f"Root-mean-square error = {str(rmse)}")
 
 # COMMAND ----------
 
