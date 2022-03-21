@@ -43,17 +43,17 @@ pyspark.sql.dataframe.DataFrame.ChronoSplit = ChronoSplit
 
 import os
 # Download Movie Lens
-basedataurl = "http://aka.ms" 
+basedataurl = "http://aka.ms"
 datafile = "MovieRatings.csv"
 
 datafile_dbfs = os.path.join("/dbfs", datafile)
 
 if os.path.isfile(datafile_dbfs):
-    print("found {} at {}".format(datafile, datafile_dbfs))
+  print(f"found {datafile} at {datafile_dbfs}")
 else:
-    print("downloading {} to {}".format(datafile, datafile_dbfs))
-    urllib.request.urlretrieve(os.path.join(basedataurl, datafile), datafile_dbfs)
-    
+  print(f"downloading {datafile} to {datafile_dbfs}")
+  urllib.request.urlretrieve(os.path.join(basedataurl, datafile), datafile_dbfs)
+
 data_all = sqlContext.read.format('csv')\
                      .options(header='true', delimiter=',', inferSchema='true', ignoreLeadingWhiteSpace='true', ignoreTrailingWhiteSpace='true')\
                      .load(datafile)
@@ -61,8 +61,8 @@ data_all = sqlContext.read.format('csv')\
 # COMMAND ----------
 
 train, test = data_all.ChronoSplit()
-print("Train Count: " + str(train.count()))
-print("Test Count:  " + str(test.count()))
+print(f"Train Count: {str(train.count())}")
+print(f"Test Count:  {str(test.count())}")
 
 # COMMAND ----------
 

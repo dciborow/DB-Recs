@@ -24,7 +24,7 @@ def getRatings():
                               StructField("rating", IntegerType()),
                               StructField("notTime", IntegerType())])
 
-        ratings = pyspark.sql.SparkSession.builder.getOrCreate().createDataFrame([
+        return pyspark.sql.SparkSession.builder.getOrCreate().createDataFrame([
             (0, 1, 4, 4),
             (0, 3, 1, 1),
             (0, 4, 5, 5),
@@ -57,7 +57,6 @@ def getRatings():
             (3, 8, 1, 1),
             (3, 9, 5, 5),
             (3, 10, 3, 3)], cSchema)
-        return ratings
 
 # COMMAND ----------
 

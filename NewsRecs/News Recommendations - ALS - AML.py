@@ -85,9 +85,9 @@ subscription_id = '03909a66-bef8-4d52-8e9a-a346604e0902'
 data = 'news'
 
 workspace_region = "westus2"
-resource_group = prefix + "_" + data
-workspace_name = prefix + "_"+data+"_aml"
-experiment_name = data + "_als_Experiment"
+resource_group = f'{prefix}_{data}'
+workspace_name = f'{prefix}_{data}_aml'
+experiment_name = f'{data}_als_Experiment'
 aks_name = "dcibigoraks"
 service_name = "dcibigoraksals"
 
@@ -162,8 +162,8 @@ evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",
                                 predictionCol="prediction")
 rmse = evaluator.evaluate(predictions)
 
-root_run.log('rmse', rmse)    
-print("Root-mean-square error = " + str(rmse))
+root_run.log('rmse', rmse)
+print(f"Root-mean-square error = {str(rmse)}")
 
 # COMMAND ----------
 
@@ -176,13 +176,14 @@ output = RankingAdapter(mode='allUsers', k=5, recommender=algo) \
   .transform(ratings)
 
 metrics = ['ndcgAt','map','recallAtK','mrr','fcp']
-metrics_dict = {}
-for metric in metrics:
-    metrics_dict[metric] = RankingEvaluator(k=3, metricName=metric).evaluate(output)
+metrics_dict = {
+    metric: RankingEvaluator(k=3, metricName=metric).evaluate(output)
+    for metric in metrics
+}
 
-for k in metrics_dict:
-  root_run.log(k, metrics_dict[k])    
-    
+for k, v in metrics_dict.items():
+    root_run.log(k, v)    
+
 metrics_dict    
 
 # COMMAND ----------
@@ -190,10 +191,8 @@ metrics_dict
 # Recommend Subset Wrapper
 def recommendSubset(self, df, timestamp):
   def Func(lines):
-    out = []
-    for i in range(len(lines[1])):
-      out += [(lines[1][i],lines[2][i])]
-    return lines[0], out
+      out = [(lines[1][i],lines[2][i]) for i in range(len(lines[1]))]
+      return lines[0], out
 
   tup = StructType([
     StructField('itemId', IntegerType(), True),
@@ -331,7 +330,7 @@ display(recs.orderBy('userId'))
 # COMMAND ----------
 
 account_name = "movies-ds-sql"
-endpoint = "https://" + account_name + ".documents.azure.com:443/"
+endpoint = f"https://{account_name}.documents.azure.com:443/"
 master_key = "KUEKaC3ULYBvZUOLk4IaBKqXaNMS9TCSSwvSCezcOVMS01jalvEPk9oYxENu5vElabUeaYIyIppzDtIbvQJsYQ=="
 
 writeConfig = {
@@ -399,7 +398,7 @@ writeConfig = {
 
 with open('score_sparkml.py', 'r') as myfile:
     score_sparkml=myfile.read()
-    
+
 import json
 score_sparkml = score_sparkml.replace("{key}",writeConfig['Masterkey']).replace("{endpoint}",writeConfig['Endpoint']).replace("{database}",writeConfig['Database']).replace("{collection}",writeConfig['Collection'])
 
@@ -498,14 +497,14 @@ service_key = aks_service.get_keys()[0]
 input_data = '["{\\"id\\":\\"1\\"}"]'.encode()
 
 req = urllib.request.Request(scoring_url,data=input_data)
-req.add_header("Authorization","Bearer {}".format(service_key))
+req.add_header("Authorization", f"Bearer {service_key}")
 req.add_header("Content-Type","application/json")
 
 tic = time.time()
 with urllib.request.urlopen(req) as result:
     res = result.readlines()
     print(res)
-    
+
 toc = time.time()
 t2 = toc - tic
 print("Full run took %.2f seconds" % (toc - tic))

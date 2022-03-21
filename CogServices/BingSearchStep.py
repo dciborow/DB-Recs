@@ -3,18 +3,18 @@ from pyspark.ml import PipelineModel
 from pyspark.sql import SparkSession
 
 #Get the inputs for the Databricks ML Step
-dbutils.widgets.get("account_name") 
+dbutils.widgets.get("account_name")
 account_name = getArgument("account_name")
 
-dbutils.widgets.get("output_path") 
+dbutils.widgets.get("output_path")
 output_path = getArgument("output_path")
 
-wasb_path    = "wasbs://azureml@"+account_name+".blob.core.windows.net/"
+wasb_path = f"wasbs://azureml@{account_name}.blob.core.windows.net/"
 
-dbutils.widgets.get("BING_IMAGE_SEARCH_KEY") 
+dbutils.widgets.get("BING_IMAGE_SEARCH_KEY")
 BING_IMAGE_SEARCH_KEY = getArgument("BING_IMAGE_SEARCH_KEY")
 
-dbutils.widgets.get("input_query") 
+dbutils.widgets.get("input_query")
 input_query = getArgument("input_query")
 
 imgsPerBatch = 10 #the number of images Bing will return for each query
